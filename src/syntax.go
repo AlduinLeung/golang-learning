@@ -21,7 +21,7 @@ const constvar string = "const"
 func Arraytesting() {
 	arr1 := []int{1, 2, 3, 4, 5}
 	arr2 := [5]int{1, 2, 3, 4, 5}
-	// i is the index, v is the value
+	// I is the index, v is the value
 	for i, v := range arr1 {
 		fmt.Println(i, v)
 	}
@@ -66,26 +66,148 @@ func Maptesting() {
 	}
 }
 
-// struct - class / Object
+// struct - class / Object without method
+
+//type Rectangle struct {
+//	length int
+//	width  int
+//}
+
+//// Area receiver function - method
+//func (r Rectangle) Area() int {
+//	return r.length * r.width
+//}
+//func (r Rectangle) Perimeter() int {
+//	return 2 * (r.length + r.width)
+//}
+
+//func Structtesting() {
+//	// instance
+//	rec := Rectangle{length: 10, width: 20}
+//	fmt.Println(rec.Area())
+//	fmt.Println(rec.Perimeter())
+//}
 
 // function
+// Pass by Value, Pass by Reference
+type account struct {
+	balance float64
+}
+
+// A method with a point receiver
+func (ac *account) Deposit(amount int) {
+	ac.balance += float64(amount)
+}
+func (ac *account) Withdraw(amount int) {
+	ac.balance -= float64(amount)
+}
+
+func add(amount int) int {
+	return amount + 10
+}
+func funcTesting() {
+	//MyAccount := account{balance: 100}
+	//MyAccount2 := &account{balance: 100}
+	//fmt.Println(MyAccount)
+	//fmt.Println(MyAccount.balance)
+	//MyAccount.Deposit(100)
+	//fmt.Println(MyAccount.balance)
+	//MyAccount.Withdraw(50)
+	//fmt.Println(MyAccount.balance)
+
+	// pass by value
+	amount := 10
+	fmt.Println(add(amount))
+	fmt.Println(amount)
+}
 
 // interface
 
-//loop if else
+type Rectangle struct {
+	Width, Height int
+}
+type Circle struct {
+	Radius int
+}
 
-// Pass by Value, Pass by Reference
+type Shape interface {
+	Area() int
+	Perimter() int
+}
+
+func (r Rectangle) Area() int {
+	return r.Width * r.Height
+}
+
+func (r Rectangle) Perimter() int {
+	return 2 * (r.Width + r.Height)
+}
+
+func (c Circle) Area() int {
+	return c.Radius * c.Radius
+}
+func (c Circle) Perimter() int {
+	return 2 * 3 * c.Radius
+}
+
+func PrintShape() {
+	r := Rectangle{Width: 10, Height: 20}
+	c := Circle{Radius: 10}
+	fmt.Println(c.Area())
+	fmt.Println(c.Perimter())
+	fmt.Println(r.Area())
+	fmt.Println(r.Perimter())
+}
 
 // OOD interface
 
+// struct composition
+type Engine struct {
+	HP int
+}
+
+type Car struct {
+	Make  string
+	Model string
+	Year  int
+	Engine
+}
+
+// interface implementation
+
+func oodTesting() {
+	// create a instance from a composition struct type
+	myCar := Car{Make: "Toyota", Model: "Camry", Year: 2020, Engine: Engine{HP: 200}}
+	fmt.Println(myCar)
+}
+
 // Go routines
 
+//TODO
+
 // Package Management - Go Modules
+
+// Error
+func doSomething() (result string, err error) {
+	// Try to do something that could fail
+	//	result, err = someOperation()
+	// If an error occurred, return the error
+	if err != nil {
+		return "", err
+	}
+
+	// If everything went fine, return the result and a nil error
+	return result, nil
+}
 
 // driver
 func main() {
 	//fmt.Println("Hello World")
 	//Maptesting()
 	//Arraytesting()
-	Slicetesting()
+	//Slicetesting()
+	//Structtesting()
+	//funcTesting()
+	//PrintShape()
+	//oodTesting()
 }

@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"TodoList/Utils"
 	"TodoList/models"
+	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/beego/beego/v2/adapter/orm"
 	"github.com/beego/beego/v2/server/web"
@@ -16,18 +18,38 @@ type TodoController struct {
 // 包外调用，方法名要大写
 func (c *TodoController) GetAllTodoList() {
 	// create orm object
-	c.Ctx.WriteString("All todos are here")
-
+	o := orm.NewOrm()
+	todo := models.Todo{}
+	slice := []models.Todo{}
+	_, err := o.QueryTable(todo).All(&slice)
+	if err != nil {
+		res := Utils.Response(500, "Failed", err)
+		c.Data["json"] = res
+		c.ServeJSON()
+	} else {
+		res := Utils.Response(200, "Success", slice)
+		c.Data["json"] = res
+		c.ServeJSON()
+	}
 }
 
+// Create A todo
 func (c *TodoController) CreateATodo() {
+	todo := models.Todo{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &todo)
+	todo.CreatedAt = time.Now()
+	todo.UpdateAt = time.Now()
+	logs.Informational(todo)
 	o := orm.NewOrm()
-	todo := models.Todo{Id: 1, Title: "First Todo", Description: "Test Database", CreatedAt: time.Now(), UpdateAt: time.Now(), Done: false}
-	code, err := o.Insert(&todo)
+	_, err := o.Insert(&todo)
 	if err != nil {
-		logs.Informational("Insert Failed", code)
+		res := Utils.Response(500, "Failed", err)
+		c.Data["json"] = res
+		c.ServeJSON()
 	}
-	c.Ctx.WriteString("Your Todos")
+	res := Utils.Response(200, "Success", todo)
+	c.Data["json"] = res
+	c.ServeJSON()
 }
 
 func (c *TodoController) GetTodoById() {
@@ -38,14 +60,13 @@ func (c *TodoController) GetTodoById() {
 	todo := models.Todo{Id: id}
 	err = o.Read(&todo)
 	if err != nil {
-		logs.Informational("Read Failed", err)
-	}
-	if todo.Id != 0 && err == nil {
-		logs.Informational(todo)
-		c.Data["json"] = todo
+		res := Utils.Response(500, "Read Failed", err)
+		c.Data["json"] = res
 		c.ServeJSON()
 	} else {
-		c.Ctx.WriteString("Todo Not Found")
+		res := Utils.Response(200, "Success", todo)
+		c.Data["json"] = res
+		c.ServeJSON()
 	}
 }
 
@@ -55,13 +76,44 @@ func (c *TodoController) DeleteTodoById() {
 	o := orm.NewOrm()
 	todo := models.Todo{Id: id}
 	_, err = o.Delete(&todo)
+	res := Utils.ResponseData{}
 	if err != nil {
+		res = Utils.Response(500, "Failed", err)
+		c.Data["json"] = res
+		c.ServeJSON()
 		logs.Informational("Delete Failed", err)
+	} else {
+		res = Utils.Response(200, "Success", todo)
+		c.Data["json"] = res
+		c.ServeJSON()
 	}
-	c.Ctx.WriteString("Delete Success")
-}
-func (c *TodoController) UpdateTodoById() {
 
+}
+
+func (c *TodoController) UpdateTodoById() {
+	params := c.Ctx.Input.Param(":id")
+	id, err := strconv.ParseInt(params, 10, 64)
+	o := orm.NewOrm()
+	todo := models.Todo{Id: id}
+	err = o.Read(&todo)
+	if err != nil {
+		res := Utils.Response(500, "Read Failed", err)
+		c.Data["json"] = res
+		c.ServeJSON()
+	} else {
+		json.Unmarshal(c.Ctx.Input.RequestBody, &todo)
+		todo.UpdateAt = time.Now()
+		_, err = o.Update(&todo)
+		if err != nil {
+			res := Utils.Response(500, "Update Failed", err)
+			c.Data["json"] = res
+			c.ServeJSON()
+		} else {
+			res := Utils.Response(200, "Success", todo)
+			c.Data["json"] = res
+			c.ServeJSON()
+		}
+	}
 }
 
 func main() {

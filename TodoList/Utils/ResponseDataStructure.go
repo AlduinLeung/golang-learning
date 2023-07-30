@@ -1,7 +1,15 @@
 package Utils
 
 type ResponseData struct {
-	code    int
-	message string
-	data    interface{} // 空接口
+	Code    int
+	Message string
+	Data    interface{} // 空接口
+}
+
+func Response(Code int, Message string, Data interface{}) ResponseData {
+	res := ResponseData{}
+	res.Code = Code
+	res.Message = Message
+	res.Data = Data
+	return res
 }

@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Golang Syntax
 
@@ -92,6 +94,22 @@ func Maptesting() {
 // Pass by Value, Pass by Reference
 type account struct {
 	balance float64
+}
+
+var testfunc = func() {
+	fmt.Println("Hello World")
+}
+
+func testFuncwithParams(anotherFunc func()) {
+	anotherFunc()
+}
+func enclouser() func() int {
+	i := 0
+	return func() int {
+		i++
+		return i
+	}
+
 }
 
 // A method with a point receiver
@@ -210,4 +228,8 @@ func main() {
 	//funcTesting()
 	//PrintShape()
 	//oodTesting()
+	testFuncwithParams(testfunc)
+
+	testenclouser := enclouser()
+	fmt.Println(testenclouser())
 }
